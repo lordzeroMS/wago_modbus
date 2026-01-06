@@ -15,7 +15,7 @@ from .helpers import build_device_info
 from .values import decode_register_value
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, kw_only=True)
 class WagoSensorDescription(SensorEntityDescription):
     address: int
     register_type: str
