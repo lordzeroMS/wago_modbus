@@ -82,7 +82,7 @@ class WagoModbusClient:
             raise ModbusClientError("Unable to connect to Modbus TCP host")
         try:
             result = client.write_coil(
-                address + self._address_offset, value, self._unit_id
+                address + self._address_offset, value, slave=self._unit_id
             )
             if result.isError():
                 raise ModbusClientError("Modbus coil write failed")
@@ -98,7 +98,7 @@ class WagoModbusClient:
             raise ModbusClientError("Unable to connect to Modbus TCP host")
         try:
             result = client.write_register(
-                address + self._address_offset, value, self._unit_id
+                address + self._address_offset, value, slave=self._unit_id
             )
             if result.isError():
                 raise ModbusClientError("Modbus register write failed")
@@ -115,11 +115,11 @@ class WagoModbusClient:
         try:
             if register_type == "input":
                 result = client.read_input_registers(
-                    start_address, block.count, self._unit_id
+                    start_address, count=block.count, slave=self._unit_id
                 )
             else:
                 result = client.read_holding_registers(
-                    start_address, block.count, self._unit_id
+                    start_address, count=block.count, slave=self._unit_id
                 )
         except ModbusException as err:
             LOGGER.debug("Modbus read error (%s): %s", register_type, err)
@@ -138,7 +138,9 @@ class WagoModbusClient:
     ) -> dict[int, bool]:
         start_address = block.start + self._address_offset
         try:
-            result = client.read_coils(start_address, block.count, self._unit_id)
+            result = client.read_coils(
+                start_address, count=block.count, slave=self._unit_id
+            )
         except ModbusException as err:
             LOGGER.debug("Modbus coil read error: %s", err)
             raise ModbusClientError("Modbus coil read raised an exception") from err
