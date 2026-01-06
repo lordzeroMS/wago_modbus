@@ -20,6 +20,7 @@ except ImportError:  # pragma: no cover - only for test environments without HA
         SENSOR = "sensor"
         CLIMATE = "climate"
         SWITCH = "switch"
+        COVER = "cover"
 
     PERCENTAGE = "%"
 
@@ -29,7 +30,7 @@ except ImportError:  # pragma: no cover - only for test environments without HA
 DOMAIN: Final = "wago_modbus"
 LOGGER = logging.getLogger(__name__)
 
-PLATFORMS: Final = [Platform.SENSOR, Platform.CLIMATE, Platform.SWITCH]
+PLATFORMS: Final = [Platform.SENSOR, Platform.CLIMATE, Platform.SWITCH, Platform.COVER]
 
 DATA_COORDINATOR: Final = "coordinator"
 DATA_HUB: Final = "hub"
@@ -88,6 +89,13 @@ class ClimateDefinition:
 
 @dataclass(frozen=True)
 class CoilDefinition:
+    key: str
+    name: str
+    address: int
+
+
+@dataclass(frozen=True)
+class CoverDefinition:
     key: str
     name: str
     address: int
@@ -496,4 +504,57 @@ COIL_DEFINITIONS: Final = (
     CoilDefinition(key="licht_eltern_1", name="Licht Eltern 1", address=33199),
     CoilDefinition(key="licht_eltern_2", name="Licht Eltern 2", address=33198),
     CoilDefinition(key="licht_wohnzimmer_decke", name="Licht Wohnzimmer Decke", address=33191),
+)
+
+COVER_DEFINITIONS: Final = (
+    CoverDefinition(
+        key="rolladen_esszimmer_cover",
+        name="Rolladen Esszimmer",
+        address=32027,
+    ),
+    CoverDefinition(
+        key="rolladen_gaestezimmer_west_cover",
+        name="Rolladen Gaestezimmer West",
+        address=32031,
+    ),
+    CoverDefinition(
+        key="rolladen_gaestezimmer_sued_cover",
+        name="Rolladen Gaestezimmer Sued",
+        address=32030,
+    ),
+    CoverDefinition(
+        key="rolladen_wohnzimmer_ost_cover",
+        name="Rolladen Wohnzimmer Ost",
+        address=32037,
+    ),
+    CoverDefinition(
+        key="rolladen_wohnzimmer_sued_cover",
+        name="Rolladen Wohnzimmer Sued",
+        address=32038,
+    ),
+    CoverDefinition(
+        key="rolladen_schlafzimmer_links_cover",
+        name="Rolladen Schlafzimmer Links",
+        address=32035,
+    ),
+    CoverDefinition(
+        key="rolladen_schlafzimmer_rechts_cover",
+        name="Rolladen Schlafzimmer Rechts",
+        address=32036,
+    ),
+    CoverDefinition(
+        key="rolladen_lilly_cover",
+        name="Rolladen Lilly",
+        address=32034,
+    ),
+    CoverDefinition(
+        key="rolladen_leroy_cover",
+        name="Rolladen Leroy",
+        address=32033,
+    ),
+    CoverDefinition(
+        key="rolladen_kueche_cover",
+        name="Rolladen Kueche",
+        address=32032,
+    ),
 )

@@ -7,6 +7,7 @@ Custom Home Assistant integration for a WAGO Modbus TCP controller with a fixed 
 - Sensor entities for temperature, humidity, and shutter status.
 - Climate entities for heating setpoints.
 - Switch entities for lights.
+- Cover entities for roller shutters.
 - Config flow UI with options for scan interval, address offset, and request sizing.
 
 ## Installation
