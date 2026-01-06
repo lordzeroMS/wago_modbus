@@ -1,0 +1,8 @@
+{
+  "name": "WAGO Modbus",
+  "content_in_root": false,
+  "domains": ["wago_modbus"],
+  "country": "DE",
+  "homeassistant": "2024.8.0",
+  "render_readme": true
+}

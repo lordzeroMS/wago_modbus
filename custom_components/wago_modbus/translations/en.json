@@ -1,0 +1,36 @@
+{
+  "title": "WAGO Modbus",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to WAGO Modbus",
+        "data": {
+          "host": "Host",
+          "port": "Port",
+          "unit_id": "Unit ID"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Unable to connect",
+      "unknown": "Unexpected error"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "WAGO Modbus options",
+        "data": {
+          "host": "Host",
+          "scan_interval": "Scan interval (seconds)",
+          "address_offset": "Address offset",
+          "timeout": "Timeout (seconds)",
+          "max_registers_per_request": "Max registers per request",
+          "max_coils_per_request": "Max coils per request",
+          "port": "Port",
+          "unit_id": "Unit ID"
+        }
+      }
+    }
+  }
+}
