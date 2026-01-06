@@ -108,7 +108,7 @@ class WagoModbusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
 class WagoModbusOptionsFlowHandler(config_entries.OptionsFlow):
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
-        self.config_entry = config_entry
+        self._config_entry = config_entry
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
@@ -117,27 +117,27 @@ class WagoModbusOptionsFlowHandler(config_entries.OptionsFlow):
             return self.async_create_entry(title="", data=user_input)
 
         defaults = {
-            CONF_HOST: self.config_entry.options.get(
-                CONF_HOST, self.config_entry.data.get(CONF_HOST)
+            CONF_HOST: self._config_entry.options.get(
+                CONF_HOST, self._config_entry.data.get(CONF_HOST)
             ),
-            CONF_SCAN_INTERVAL: self.config_entry.options.get(
+            CONF_SCAN_INTERVAL: self._config_entry.options.get(
                 CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
             ),
-            CONF_ADDRESS_OFFSET: self.config_entry.options.get(
+            CONF_ADDRESS_OFFSET: self._config_entry.options.get(
                 CONF_ADDRESS_OFFSET, DEFAULT_ADDRESS_OFFSET
             ),
-            CONF_TIMEOUT: self.config_entry.options.get(CONF_TIMEOUT, DEFAULT_TIMEOUT),
-            CONF_MAX_REGISTERS_PER_REQUEST: self.config_entry.options.get(
+            CONF_TIMEOUT: self._config_entry.options.get(CONF_TIMEOUT, DEFAULT_TIMEOUT),
+            CONF_MAX_REGISTERS_PER_REQUEST: self._config_entry.options.get(
                 CONF_MAX_REGISTERS_PER_REQUEST, DEFAULT_MAX_REGISTERS_PER_REQUEST
             ),
-            CONF_MAX_COILS_PER_REQUEST: self.config_entry.options.get(
+            CONF_MAX_COILS_PER_REQUEST: self._config_entry.options.get(
                 CONF_MAX_COILS_PER_REQUEST, DEFAULT_MAX_COILS_PER_REQUEST
             ),
-            CONF_PORT: self.config_entry.options.get(
-                CONF_PORT, self.config_entry.data.get(CONF_PORT, DEFAULT_PORT)
+            CONF_PORT: self._config_entry.options.get(
+                CONF_PORT, self._config_entry.data.get(CONF_PORT, DEFAULT_PORT)
             ),
-            CONF_UNIT_ID: self.config_entry.options.get(
-                CONF_UNIT_ID, self.config_entry.data.get(CONF_UNIT_ID, DEFAULT_UNIT_ID)
+            CONF_UNIT_ID: self._config_entry.options.get(
+                CONF_UNIT_ID, self._config_entry.data.get(CONF_UNIT_ID, DEFAULT_UNIT_ID)
             ),
         }
 
