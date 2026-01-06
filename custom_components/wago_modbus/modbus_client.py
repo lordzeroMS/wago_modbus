@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import inspect
 from typing import Iterable
 
 from pymodbus.client import ModbusTcpClient
@@ -81,8 +82,8 @@ class WagoModbusClient:
         if not client.connect():
             raise ModbusClientError("Unable to connect to Modbus TCP host")
         try:
-            result = client.write_coil(
-                address + self._address_offset, value, slave=self._unit_id
+            result = self._call_with_unit(
+                client.write_coil, address + self._address_offset, value
             )
             if result.isError():
                 raise ModbusClientError("Modbus coil write failed")
@@ -97,8 +98,8 @@ class WagoModbusClient:
         if not client.connect():
             raise ModbusClientError("Unable to connect to Modbus TCP host")
         try:
-            result = client.write_register(
-                address + self._address_offset, value, slave=self._unit_id
+            result = self._call_with_unit(
+                client.write_register, address + self._address_offset, value
             )
             if result.isError():
                 raise ModbusClientError("Modbus register write failed")
@@ -114,12 +115,16 @@ class WagoModbusClient:
         start_address = block.start + self._address_offset
         try:
             if register_type == "input":
-                result = client.read_input_registers(
-                    start_address, count=block.count, slave=self._unit_id
+                result = self._call_with_unit(
+                    client.read_input_registers,
+                    start_address,
+                    count=block.count,
                 )
             else:
-                result = client.read_holding_registers(
-                    start_address, count=block.count, slave=self._unit_id
+                result = self._call_with_unit(
+                    client.read_holding_registers,
+                    start_address,
+                    count=block.count,
                 )
         except ModbusException as err:
             LOGGER.debug("Modbus read error (%s): %s", register_type, err)
@@ -138,8 +143,8 @@ class WagoModbusClient:
     ) -> dict[int, bool]:
         start_address = block.start + self._address_offset
         try:
-            result = client.read_coils(
-                start_address, count=block.count, slave=self._unit_id
+            result = self._call_with_unit(
+                client.read_coils, start_address, count=block.count
             )
         except ModbusException as err:
             LOGGER.debug("Modbus coil read error: %s", err)
@@ -152,3 +157,15 @@ class WagoModbusClient:
         for idx, value in enumerate(result.bits[: block.count]):
             coils[block.start + idx] = bool(value)
         return coils
+
+    def _call_with_unit(self, func, *args, **kwargs):
+        try:
+            params = inspect.signature(func).parameters
+        except (TypeError, ValueError):
+            params = {}
+
+        if "slave" in params:
+            return func(*args, slave=self._unit_id, **kwargs)
+        if "unit" in params:
+            return func(*args, unit=self._unit_id, **kwargs)
+        return func(*args, **kwargs)
