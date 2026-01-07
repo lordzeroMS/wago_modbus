@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DATA_COORDINATOR, DOMAIN, SENSOR_DEFINITIONS
+from .const import DATA_COORDINATOR, DATA_ENTITY_MAP, DOMAIN
 from .coordinator import WagoModbusCoordinator
 from .helpers import build_device_info
 from .values import decode_register_value
@@ -25,35 +25,34 @@ class WagoSensorDescription(SensorEntityDescription):
     precision: int | None
 
 
-SENSOR_TYPES = tuple(
-    WagoSensorDescription(
-        key=definition.key,
-        name=definition.name,
-        native_unit_of_measurement=definition.unit,
-        device_class=definition.device_class,
-        state_class=definition.state_class,
-        address=definition.address,
-        register_type=definition.register_type,
-        data_type=definition.data_type,
-        scale=definition.scale,
-        offset=definition.offset,
-        precision=definition.precision,
-    )
-    for definition in SENSOR_DEFINITIONS
-)
-
-
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     coordinator: WagoModbusCoordinator = hass.data[DOMAIN][entry.entry_id][
         DATA_COORDINATOR
     ]
+    entity_map = hass.data[DOMAIN][entry.entry_id][DATA_ENTITY_MAP]
     device_info = build_device_info(entry.entry_id)
+    sensor_types = tuple(
+        WagoSensorDescription(
+            key=definition.key,
+            name=definition.name,
+            native_unit_of_measurement=definition.unit,
+            device_class=definition.device_class,
+            state_class=definition.state_class,
+            address=definition.address,
+            register_type=definition.register_type,
+            data_type=definition.data_type,
+            scale=definition.scale,
+            offset=definition.offset,
+            precision=definition.precision,
+        )
+        for definition in entity_map.sensors
+    )
 
     async_add_entities(
         WagoModbusSensor(coordinator, entry.entry_id, device_info, description)
-        for description in SENSOR_TYPES
+        for description in sensor_types
     )
 
 

@@ -29,7 +29,9 @@ Options (via the integration options menu):
 - Max registers per request (default 125)
 - Max coils per request (default 2000)
 - Port and Unit ID overrides
+- Entity map (JSON)
 
 ## Notes
-- The register map is currently hardcoded from `modbus.yaml`. Adjust definitions in `custom_components/wago_modbus/const.py` if addresses or names change.
+- The default register map is defined in `custom_components/wago_modbus/const.py`.
+- You can override the register map via the JSON entity map in the options flow (see `entity_map.sample.json`).
 - Entity names are ASCII-only by default; you can rename entities in Home Assistant for localized names.

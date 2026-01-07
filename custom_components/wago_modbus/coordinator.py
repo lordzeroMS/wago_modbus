@@ -8,8 +8,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .const import (
-    CLIMATE_DEFINITIONS,
-    COIL_DEFINITIONS,
     CONF_ADDRESS_OFFSET,
     CONF_HOST,
     CONF_MAX_COILS_PER_REQUEST,
@@ -28,8 +26,8 @@ from .const import (
     LOGGER,
     REGISTER_HOLDING,
     REGISTER_INPUT,
-    SENSOR_DEFINITIONS,
 )
+from .entity_map import EntityMap
 from .blocks import build_blocks
 from .modbus_client import ModbusClientError, WagoModbusClient
 from .models import ModbusBlock, ModbusData
@@ -78,44 +76,48 @@ class WagoModbusHub:
             )
 
 
-def build_input_addresses() -> list[int]:
+def build_input_addresses(entity_map: EntityMap) -> list[int]:
     return [
         definition.address
-        for definition in SENSOR_DEFINITIONS
+        for definition in entity_map.sensors
         if definition.register_type == REGISTER_INPUT
     ]
 
 
-def build_holding_addresses() -> list[int]:
+def build_holding_addresses(entity_map: EntityMap) -> list[int]:
     addresses = [
         definition.address
-        for definition in SENSOR_DEFINITIONS
+        for definition in entity_map.sensors
         if definition.register_type == REGISTER_HOLDING
     ]
-    for climate in CLIMATE_DEFINITIONS:
+    for climate in entity_map.climates:
         addresses.append(climate.current_temp_register)
         addresses.append(climate.target_temp_register)
+    for cover in entity_map.covers:
+        addresses.append(cover.address)
     return addresses
 
 
-def build_coil_addresses() -> list[int]:
-    return [definition.address for definition in COIL_DEFINITIONS]
+def build_coil_addresses(entity_map: EntityMap) -> list[int]:
+    return [definition.address for definition in entity_map.switches]
 
 
 def entry_option(entry, key, default):
     return entry.options.get(key, entry.data.get(key, default))
 
 
-def build_entry_blocks(entry) -> tuple[list[ModbusBlock], list[ModbusBlock], list[ModbusBlock]]:
+def build_entry_blocks(
+    entry, entity_map: EntityMap
+) -> tuple[list[ModbusBlock], list[ModbusBlock], list[ModbusBlock]]:
     max_registers = entry_option(
         entry, CONF_MAX_REGISTERS_PER_REQUEST, DEFAULT_MAX_REGISTERS_PER_REQUEST
     )
     max_coils = entry_option(
         entry, CONF_MAX_COILS_PER_REQUEST, DEFAULT_MAX_COILS_PER_REQUEST
     )
-    input_blocks = build_blocks(build_input_addresses(), max_registers)
-    holding_blocks = build_blocks(build_holding_addresses(), max_registers)
-    coil_blocks = build_blocks(build_coil_addresses(), max_coils)
+    input_blocks = build_blocks(build_input_addresses(entity_map), max_registers)
+    holding_blocks = build_blocks(build_holding_addresses(entity_map), max_registers)
+    coil_blocks = build_blocks(build_coil_addresses(entity_map), max_coils)
     return input_blocks, holding_blocks, coil_blocks
 
 

@@ -34,6 +34,7 @@ PLATFORMS: Final = [Platform.SENSOR, Platform.CLIMATE, Platform.SWITCH, Platform
 
 DATA_COORDINATOR: Final = "coordinator"
 DATA_HUB: Final = "hub"
+DATA_ENTITY_MAP: Final = "entity_map"
 
 CONF_HOST: Final = "host"
 CONF_PORT: Final = "port"
@@ -43,6 +44,7 @@ CONF_ADDRESS_OFFSET: Final = "address_offset"
 CONF_TIMEOUT: Final = "timeout"
 CONF_MAX_REGISTERS_PER_REQUEST: Final = "max_registers_per_request"
 CONF_MAX_COILS_PER_REQUEST: Final = "max_coils_per_request"
+CONF_ENTITY_MAP: Final = "entity_map_json"
 
 DEFAULT_PORT: Final = 502
 DEFAULT_UNIT_ID: Final = 1

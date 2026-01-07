@@ -6,7 +6,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import COIL_DEFINITIONS, DATA_COORDINATOR, DATA_HUB, DOMAIN
+from .const import DATA_COORDINATOR, DATA_ENTITY_MAP, DATA_HUB, DOMAIN
 from .coordinator import WagoModbusCoordinator, WagoModbusHub
 from .helpers import build_device_info
 
@@ -17,11 +17,12 @@ async def async_setup_entry(
     entry_data = hass.data[DOMAIN][entry.entry_id]
     coordinator: WagoModbusCoordinator = entry_data[DATA_COORDINATOR]
     hub: WagoModbusHub = entry_data[DATA_HUB]
+    entity_map = entry_data[DATA_ENTITY_MAP]
     device_info = build_device_info(entry.entry_id)
 
     async_add_entities(
         WagoModbusSwitch(coordinator, hub, entry.entry_id, device_info, definition)
-        for definition in COIL_DEFINITIONS
+        for definition in entity_map.switches
     )
 
 

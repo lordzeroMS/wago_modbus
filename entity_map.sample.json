@@ -1,0 +1,566 @@
+{
+  "climates": [
+    {
+      "current_temp_register": 32023,
+      "key": "wohn_climate",
+      "max_temp": 35.0,
+      "min_temp": 15.0,
+      "name": "Wohnzimmer Heizung",
+      "precision": 1,
+      "scale": 0.01,
+      "target_temp_register": 32024,
+      "temp_step": 0.5
+    },
+    {
+      "current_temp_register": 32011,
+      "key": "gaeste_climate",
+      "max_temp": 35.0,
+      "min_temp": 15.0,
+      "name": "Gaestezimmer Heizung",
+      "precision": 1,
+      "scale": 0.01,
+      "target_temp_register": 32012,
+      "temp_step": 0.5
+    },
+    {
+      "current_temp_register": 32005,
+      "key": "bad_unten_climate",
+      "max_temp": 35.0,
+      "min_temp": 15.0,
+      "name": "Bad unten Heizung",
+      "precision": 1,
+      "scale": 0.01,
+      "target_temp_register": 32006,
+      "temp_step": 0.5
+    },
+    {
+      "current_temp_register": 32002,
+      "key": "bad_oben_climate",
+      "max_temp": 35.0,
+      "min_temp": 15.0,
+      "name": "Bad oben Heizung",
+      "precision": 1,
+      "scale": 0.01,
+      "target_temp_register": 32003,
+      "temp_step": 0.5
+    },
+    {
+      "current_temp_register": 32014,
+      "key": "hwk_oben_climate",
+      "max_temp": 35.0,
+      "min_temp": 15.0,
+      "name": "Hauswirtschaftsraum oben Heizung",
+      "precision": 1,
+      "scale": 0.01,
+      "target_temp_register": 32015,
+      "temp_step": 0.5
+    },
+    {
+      "current_temp_register": 32020,
+      "key": "lilly_climate",
+      "max_temp": 35.0,
+      "min_temp": 15.0,
+      "name": "Lilly Heizung",
+      "precision": 1,
+      "scale": 0.01,
+      "target_temp_register": 32021,
+      "temp_step": 0.5
+    },
+    {
+      "current_temp_register": 32017,
+      "key": "leroy_climate",
+      "max_temp": 35.0,
+      "min_temp": 15.0,
+      "name": "Leroy Heizung",
+      "precision": 1,
+      "scale": 0.01,
+      "target_temp_register": 32018,
+      "temp_step": 0.5
+    },
+    {
+      "current_temp_register": 32008,
+      "key": "eltern_climate",
+      "max_temp": 35.0,
+      "min_temp": 15.0,
+      "name": "Eltern Heizung",
+      "precision": 1,
+      "scale": 0.01,
+      "target_temp_register": 32009,
+      "temp_step": 0.5
+    }
+  ],
+  "covers": [
+    {
+      "address": 32027,
+      "key": "rolladen_esszimmer_cover",
+      "name": "Rolladen Esszimmer"
+    },
+    {
+      "address": 32031,
+      "key": "rolladen_gaestezimmer_west_cover",
+      "name": "Rolladen Gaestezimmer West"
+    },
+    {
+      "address": 32030,
+      "key": "rolladen_gaestezimmer_sued_cover",
+      "name": "Rolladen Gaestezimmer Sued"
+    },
+    {
+      "address": 32037,
+      "key": "rolladen_wohnzimmer_ost_cover",
+      "name": "Rolladen Wohnzimmer Ost"
+    },
+    {
+      "address": 32038,
+      "key": "rolladen_wohnzimmer_sued_cover",
+      "name": "Rolladen Wohnzimmer Sued"
+    },
+    {
+      "address": 32035,
+      "key": "rolladen_schlafzimmer_links_cover",
+      "name": "Rolladen Schlafzimmer Links"
+    },
+    {
+      "address": 32036,
+      "key": "rolladen_schlafzimmer_rechts_cover",
+      "name": "Rolladen Schlafzimmer Rechts"
+    },
+    {
+      "address": 32034,
+      "key": "rolladen_lilly_cover",
+      "name": "Rolladen Lilly"
+    },
+    {
+      "address": 32033,
+      "key": "rolladen_leroy_cover",
+      "name": "Rolladen Leroy"
+    },
+    {
+      "address": 32032,
+      "key": "rolladen_kueche_cover",
+      "name": "Rolladen Kueche"
+    }
+  ],
+  "sensors": [
+    {
+      "address": 32023,
+      "data_type": "int16",
+      "device_class": "temperature",
+      "key": "wohn_temp",
+      "name": "Wohnzimmer Temperatur",
+      "offset": 0.0,
+      "precision": 2,
+      "register_type": "input",
+      "scale": 0.01,
+      "state_class": "measurement",
+      "unit": "C"
+    },
+    {
+      "address": 32022,
+      "data_type": "int16",
+      "device_class": "humidity",
+      "key": "wohn_humidity",
+      "name": "Wohnzimmer Luftfeuchtigkeit",
+      "offset": 0.0,
+      "precision": 2,
+      "register_type": "input",
+      "scale": 0.01,
+      "state_class": "measurement",
+      "unit": "%"
+    },
+    {
+      "address": 32011,
+      "data_type": "int16",
+      "device_class": "temperature",
+      "key": "gaeste_temp",
+      "name": "Gaestezimmer Temperatur",
+      "offset": 0.0,
+      "precision": 2,
+      "register_type": "input",
+      "scale": 0.01,
+      "state_class": "measurement",
+      "unit": "C"
+    },
+    {
+      "address": 32010,
+      "data_type": "int16",
+      "device_class": "humidity",
+      "key": "gaeste_humidity",
+      "name": "Gaestezimmer Luftfeuchtigkeit",
+      "offset": 0.0,
+      "precision": 2,
+      "register_type": "input",
+      "scale": 0.01,
+      "state_class": "measurement",
+      "unit": "%"
+    },
+    {
+      "address": 32005,
+      "data_type": "int16",
+      "device_class": "temperature",
+      "key": "bad_unten_temp",
+      "name": "Bad unten Temperatur",
+      "offset": 0.0,
+      "precision": 2,
+      "register_type": "input",
+      "scale": 0.01,
+      "state_class": "measurement",
+      "unit": "C"
+    },
+    {
+      "address": 32004,
+      "data_type": "int16",
+      "device_class": "humidity",
+      "key": "bad_unten_humidity",
+      "name": "Bad unten Luftfeuchtigkeit",
+      "offset": 0.0,
+      "precision": 2,
+      "register_type": "input",
+      "scale": 0.01,
+      "state_class": "measurement",
+      "unit": "%"
+    },
+    {
+      "address": 32002,
+      "data_type": "int16",
+      "device_class": "temperature",
+      "key": "bad_oben_temp",
+      "name": "Bad oben Temperatur",
+      "offset": 0.0,
+      "precision": 2,
+      "register_type": "input",
+      "scale": 0.01,
+      "state_class": "measurement",
+      "unit": "C"
+    },
+    {
+      "address": 32001,
+      "data_type": "int16",
+      "device_class": "humidity",
+      "key": "bad_oben_humidity",
+      "name": "Bad oben Luftfeuchtigkeit",
+      "offset": 0.0,
+      "precision": 2,
+      "register_type": "input",
+      "scale": 0.01,
+      "state_class": "measurement",
+      "unit": "%"
+    },
+    {
+      "address": 32014,
+      "data_type": "int16",
+      "device_class": "temperature",
+      "key": "hwk_oben_temp",
+      "name": "Hauswirtschaftsraum oben Temperatur",
+      "offset": 0.0,
+      "precision": 2,
+      "register_type": "input",
+      "scale": 0.01,
+      "state_class": "measurement",
+      "unit": "C"
+    },
+    {
+      "address": 32013,
+      "data_type": "int16",
+      "device_class": "humidity",
+      "key": "hwk_oben_humidity",
+      "name": "Hauswirtschaftsraum oben Luftfeuchtigkeit",
+      "offset": 0.0,
+      "precision": 2,
+      "register_type": "input",
+      "scale": 0.01,
+      "state_class": "measurement",
+      "unit": "%"
+    },
+    {
+      "address": 32020,
+      "data_type": "int16",
+      "device_class": "temperature",
+      "key": "lilly_temp",
+      "name": "Lilly Temperatur",
+      "offset": 0.0,
+      "precision": 2,
+      "register_type": "input",
+      "scale": 0.01,
+      "state_class": "measurement",
+      "unit": "C"
+    },
+    {
+      "address": 32019,
+      "data_type": "int16",
+      "device_class": "humidity",
+      "key": "lilly_humidity",
+      "name": "Lilly Luftfeuchtigkeit",
+      "offset": 0.0,
+      "precision": 2,
+      "register_type": "input",
+      "scale": 0.01,
+      "state_class": "measurement",
+      "unit": "%"
+    },
+    {
+      "address": 32017,
+      "data_type": "int16",
+      "device_class": "temperature",
+      "key": "leroy_temp",
+      "name": "Leroy Temperatur",
+      "offset": 0.0,
+      "precision": 2,
+      "register_type": "input",
+      "scale": 0.01,
+      "state_class": "measurement",
+      "unit": "C"
+    },
+    {
+      "address": 32016,
+      "data_type": "int16",
+      "device_class": "humidity",
+      "key": "leroy_humidity",
+      "name": "Leroy Luftfeuchtigkeit",
+      "offset": 0.0,
+      "precision": 2,
+      "register_type": "input",
+      "scale": 0.01,
+      "state_class": "measurement",
+      "unit": "%"
+    },
+    {
+      "address": 32008,
+      "data_type": "int16",
+      "device_class": "temperature",
+      "key": "eltern_temp",
+      "name": "Eltern Temperatur",
+      "offset": 0.0,
+      "precision": 2,
+      "register_type": "input",
+      "scale": 0.01,
+      "state_class": "measurement",
+      "unit": "C"
+    },
+    {
+      "address": 32007,
+      "data_type": "int16",
+      "device_class": "humidity",
+      "key": "eltern_humidity",
+      "name": "Eltern Luftfeuchtigkeit",
+      "offset": 0.0,
+      "precision": 2,
+      "register_type": "input",
+      "scale": 0.01,
+      "state_class": "measurement",
+      "unit": "%"
+    },
+    {
+      "address": 32027,
+      "data_type": "uint16",
+      "device_class": null,
+      "key": "rolladen_esszimmer_status",
+      "name": "Rolladen Esszimmer Status",
+      "offset": 0.0,
+      "precision": 0,
+      "register_type": "holding",
+      "scale": 1.0,
+      "state_class": "measurement",
+      "unit": "%"
+    },
+    {
+      "address": 32031,
+      "data_type": "uint16",
+      "device_class": null,
+      "key": "rolladen_gaestezimmer_west_status",
+      "name": "Rolladen Gaestezimmer West Status",
+      "offset": 0.0,
+      "precision": 0,
+      "register_type": "holding",
+      "scale": 1.0,
+      "state_class": "measurement",
+      "unit": "%"
+    },
+    {
+      "address": 32030,
+      "data_type": "uint16",
+      "device_class": null,
+      "key": "rolladen_gaestezimmer_sued_status",
+      "name": "Rolladen Gaestezimmer Sued Status",
+      "offset": 0.0,
+      "precision": 0,
+      "register_type": "holding",
+      "scale": 1.0,
+      "state_class": "measurement",
+      "unit": "%"
+    },
+    {
+      "address": 32037,
+      "data_type": "uint16",
+      "device_class": null,
+      "key": "rolladen_wohnzimmer_ost_status",
+      "name": "Rolladen Wohnzimmer Ost Status",
+      "offset": 0.0,
+      "precision": 0,
+      "register_type": "holding",
+      "scale": 1.0,
+      "state_class": "measurement",
+      "unit": "%"
+    },
+    {
+      "address": 32038,
+      "data_type": "uint16",
+      "device_class": null,
+      "key": "rolladen_wohnzimmer_sued_status",
+      "name": "Rolladen Wohnzimmer Sued Status",
+      "offset": 0.0,
+      "precision": 0,
+      "register_type": "holding",
+      "scale": 1.0,
+      "state_class": "measurement",
+      "unit": "%"
+    },
+    {
+      "address": 32035,
+      "data_type": "uint16",
+      "device_class": null,
+      "key": "rolladen_schlafzimmer_links_status",
+      "name": "Rolladen Schlafzimmer Links Status",
+      "offset": 0.0,
+      "precision": 0,
+      "register_type": "holding",
+      "scale": 1.0,
+      "state_class": "measurement",
+      "unit": "%"
+    },
+    {
+      "address": 32036,
+      "data_type": "uint16",
+      "device_class": null,
+      "key": "rolladen_schlafzimmer_rechts_status",
+      "name": "Rolladen Schlafzimmer Rechts Status",
+      "offset": 0.0,
+      "precision": 0,
+      "register_type": "holding",
+      "scale": 1.0,
+      "state_class": "measurement",
+      "unit": "%"
+    },
+    {
+      "address": 32034,
+      "data_type": "uint16",
+      "device_class": null,
+      "key": "rolladen_lilly_status",
+      "name": "Rolladen Lilly Status",
+      "offset": 0.0,
+      "precision": 0,
+      "register_type": "holding",
+      "scale": 1.0,
+      "state_class": "measurement",
+      "unit": "%"
+    },
+    {
+      "address": 32033,
+      "data_type": "uint16",
+      "device_class": null,
+      "key": "rolladen_leroy_status",
+      "name": "Rolladen Leroy Status",
+      "offset": 0.0,
+      "precision": 0,
+      "register_type": "holding",
+      "scale": 1.0,
+      "state_class": "measurement",
+      "unit": "%"
+    },
+    {
+      "address": 32032,
+      "data_type": "uint16",
+      "device_class": null,
+      "key": "rolladen_kueche_status",
+      "name": "Rolladen Kueche Status",
+      "offset": 0.0,
+      "precision": 0,
+      "register_type": "holding",
+      "scale": 1.0,
+      "state_class": "measurement",
+      "unit": "%"
+    }
+  ],
+  "switches": [
+    {
+      "address": 33184,
+      "key": "licht_aussen_kueche",
+      "name": "Licht Aussen Kueche"
+    },
+    {
+      "address": 33185,
+      "key": "licht_aussen_wohnzimmer",
+      "name": "Licht Aussen Wohnzimmer"
+    },
+    {
+      "address": 33192,
+      "key": "licht_buero_dg",
+      "name": "Licht Buero DG"
+    },
+    {
+      "address": 33186,
+      "key": "licht_esszimmer_decke",
+      "name": "Licht Esszimmer Decke"
+    },
+    {
+      "address": 33187,
+      "key": "licht_gaeste",
+      "name": "Licht Gaestezimmer"
+    },
+    {
+      "address": 33188,
+      "key": "licht_garage",
+      "name": "Licht Garage"
+    },
+    {
+      "address": 33189,
+      "key": "licht_hwr_unten",
+      "name": "Licht HWR unten"
+    },
+    {
+      "address": 33193,
+      "key": "licht_hwr_oben",
+      "name": "Licht HWR oben"
+    },
+    {
+      "address": 33190,
+      "key": "licht_kueche",
+      "name": "Licht Kueche"
+    },
+    {
+      "address": 33195,
+      "key": "licht_leroy_1",
+      "name": "Licht Leroy 1"
+    },
+    {
+      "address": 33194,
+      "key": "licht_leroy_2",
+      "name": "Licht Leroy 2"
+    },
+    {
+      "address": 33197,
+      "key": "licht_lilly_1",
+      "name": "Licht Lilly 1"
+    },
+    {
+      "address": 33196,
+      "key": "licht_lilly_2",
+      "name": "Licht Lilly 2"
+    },
+    {
+      "address": 33199,
+      "key": "licht_eltern_1",
+      "name": "Licht Eltern 1"
+    },
+    {
+      "address": 33198,
+      "key": "licht_eltern_2",
+      "name": "Licht Eltern 2"
+    },
+    {
+      "address": 33191,
+      "key": "licht_wohnzimmer_decke",
+      "name": "Licht Wohnzimmer Decke"
+    }
+  ]
+}

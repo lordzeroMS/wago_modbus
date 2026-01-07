@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from .const import DATA_COORDINATOR, DATA_HUB, DOMAIN, PLATFORMS
+from .const import DATA_COORDINATOR, DATA_ENTITY_MAP, DATA_HUB, DOMAIN, PLATFORMS
+from .entity_map import load_entity_map
 
 if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
@@ -17,8 +18,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         entry_scan_interval,
     )
 
+    entity_map = load_entity_map(entry)
     hub = await async_build_hub(hass, entry)
-    input_blocks, holding_blocks, coil_blocks = build_entry_blocks(entry)
+    input_blocks, holding_blocks, coil_blocks = build_entry_blocks(entry, entity_map)
 
     coordinator = WagoModbusCoordinator(
         hass,
@@ -33,6 +35,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {
         DATA_HUB: hub,
         DATA_COORDINATOR: coordinator,
+        DATA_ENTITY_MAP: entity_map,
     }
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)

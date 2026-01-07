@@ -28,9 +28,13 @@
           "max_registers_per_request": "Max registers per request",
           "max_coils_per_request": "Max coils per request",
           "port": "Port",
-          "unit_id": "Unit ID"
+          "unit_id": "Unit ID",
+          "entity_map_json": "Entity map (JSON)"
         }
       }
+    },
+    "error": {
+      "invalid_entity_map": "Invalid entity map JSON"
     }
   }
 }
