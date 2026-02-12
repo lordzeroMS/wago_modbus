@@ -1,8 +1,14 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from typing import Any
+
+try:
+    import yaml
+except ImportError:  # pragma: no cover - Home Assistant ships pyyaml
+    yaml = None
 
 from .const import (
     CLIMATE_DEFINITIONS,
@@ -62,20 +68,18 @@ def parse_entity_map(raw: Any) -> EntityMap:
     if raw in (None, ""):
         return default_entity_map()
 
-    if isinstance(raw, str):
-        try:
-            data = json.loads(raw)
-        except json.JSONDecodeError as err:
-            raise ValueError("Invalid JSON for entity map") from err
-    elif isinstance(raw, dict):
-        data = raw
-    else:
-        raise ValueError("Entity map must be a JSON string or object")
+    data = _load_entity_map_payload(raw)
+    if isinstance(data, list):
+        return _parse_simple_entities(data)
+    if not isinstance(data, dict):
+        raise ValueError("Entity map must be a JSON/YAML object or list")
+    if "entities" in data:
+        return _parse_simple_entities(_require_list(data, "entities"))
 
-    sensors = tuple(_parse_register(item) for item in data.get("sensors", []))
-    climates = tuple(_parse_climate(item) for item in data.get("climates", []))
-    switches = tuple(_parse_coil(item) for item in data.get("switches", []))
-    covers = tuple(_parse_cover(item) for item in data.get("covers", []))
+    sensors = tuple(_parse_register(item) for item in _read_items(data, "sensors"))
+    climates = tuple(_parse_climate(item) for item in _read_items(data, "climates"))
+    switches = tuple(_parse_coil(item) for item in _read_items(data, "switches"))
+    covers = tuple(_parse_cover(item) for item in _read_items(data, "covers"))
 
     return EntityMap(
         sensors=sensors,
@@ -83,6 +87,123 @@ def parse_entity_map(raw: Any) -> EntityMap:
         switches=switches,
         covers=covers,
     )
+
+
+def _load_entity_map_payload(raw: Any) -> Any:
+    if isinstance(raw, (dict, list)):
+        return raw
+    if not isinstance(raw, str):
+        raise ValueError("Entity map must be a JSON/YAML string, object, or list")
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        if yaml is None:
+            raise ValueError("Invalid entity map JSON/YAML")
+        try:
+            payload = yaml.safe_load(raw)
+        except yaml.YAMLError as err:
+            raise ValueError("Invalid entity map JSON/YAML") from err
+        if payload is None:
+            return {}
+        return payload
+
+
+def _read_items(data: dict[str, Any], key: str) -> list[dict[str, Any]]:
+    items = data.get(key, [])
+    if not isinstance(items, list):
+        raise ValueError(f"Invalid {key}: expected a list")
+    parsed_items: list[dict[str, Any]] = []
+    for item in items:
+        if not isinstance(item, dict):
+            raise ValueError(f"Invalid {key}: expected an object entry")
+        parsed_items.append(item)
+    return parsed_items
+
+
+def _parse_simple_entities(items: list[dict[str, Any]]) -> EntityMap:
+    switches: list[CoilDefinition] = []
+    covers: list[CoverDefinition] = []
+    seen_keys: set[str] = set()
+    for item in items:
+        if not isinstance(item, dict):
+            raise ValueError("Invalid entities entry: expected an object")
+        name = _require_str(item, "name")
+        entity_type = _simple_entity_type(item)
+        key = _simple_entity_key(item, name, entity_type, seen_keys)
+        seen_keys.add(key)
+        address = _simple_entity_address(item)
+        reversed_flag = _optional_bool(item, "reversed")
+        if entity_type == "switch":
+            switches.append(
+                CoilDefinition(
+                    key=key,
+                    name=name,
+                    address=address,
+                    reversed=reversed_flag,
+                )
+            )
+        else:
+            covers.append(
+                CoverDefinition(
+                    key=key,
+                    name=name,
+                    address=address,
+                    reversed=reversed_flag,
+                )
+            )
+    return EntityMap(
+        sensors=(),
+        climates=(),
+        switches=tuple(switches),
+        covers=tuple(covers),
+    )
+
+
+def _simple_entity_type(item: dict[str, Any]) -> str:
+    raw_type = item.get("type", item.get("entity_type"))
+    if not isinstance(raw_type, str):
+        raise ValueError("Missing or invalid type")
+    normalized = raw_type.strip().lower()
+    if normalized in ("switch", "coil"):
+        return "switch"
+    if normalized == "cover":
+        return "cover"
+    raise ValueError(f"Invalid type '{raw_type}'")
+
+
+def _simple_entity_address(item: dict[str, Any]) -> int:
+    if "address" in item:
+        return _require_int(item, "address")
+    if "modbus_address" in item:
+        return _require_int(item, "modbus_address")
+    raise ValueError("Missing or invalid address")
+
+
+def _simple_entity_key(
+    item: dict[str, Any], name: str, entity_type: str, seen_keys: set[str]
+) -> str:
+    if "key" in item:
+        key = _require_str(item, "key")
+        if key in seen_keys:
+            raise ValueError(f"Duplicate key '{key}'")
+        return key
+
+    base = re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")
+    if not base:
+        base = f"{entity_type}_{_simple_entity_address(item)}"
+    candidate = base
+    suffix = 2
+    while candidate in seen_keys:
+        candidate = f"{base}_{suffix}"
+        suffix += 1
+    return candidate
+
+
+def _require_list(item: dict[str, Any], key: str) -> list[dict[str, Any]]:
+    value = item.get(key)
+    if not isinstance(value, list):
+        raise ValueError(f"Missing or invalid {key}")
+    return value
 
 
 def _parse_register(item: dict[str, Any]) -> RegisterDefinition:
@@ -137,6 +258,7 @@ def _parse_coil(item: dict[str, Any]) -> CoilDefinition:
         key=_require_str(item, "key"),
         name=_require_str(item, "name"),
         address=_require_int(item, "address"),
+        reversed=_optional_bool(item, "reversed"),
     )
 
 
@@ -145,6 +267,7 @@ def _parse_cover(item: dict[str, Any]) -> CoverDefinition:
         key=_require_str(item, "key"),
         name=_require_str(item, "name"),
         address=_require_int(item, "address"),
+        reversed=_optional_bool(item, "reversed"),
     )
 
 
@@ -163,6 +286,23 @@ def _require_int(item: dict[str, Any], key: str) -> int:
         return int(value)
     except (TypeError, ValueError) as err:
         raise ValueError(f"Missing or invalid {key}") from err
+
+
+def _optional_bool(item: dict[str, Any], key: str) -> bool:
+    value = item.get(key)
+    if value is None:
+        return False
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, int) and value in (0, 1):
+        return bool(value)
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in ("1", "true", "yes", "on"):
+            return True
+        if normalized in ("0", "false", "no", "off"):
+            return False
+    raise ValueError(f"Missing or invalid {key}")
 
 
 def _map_unit(unit: str | None) -> str | None:
@@ -225,11 +365,25 @@ def _climate_to_dict(definition: ClimateDefinition) -> dict[str, Any]:
 
 
 def _coil_to_dict(definition: CoilDefinition) -> dict[str, Any]:
-    return {"key": definition.key, "name": definition.name, "address": definition.address}
+    payload = {
+        "key": definition.key,
+        "name": definition.name,
+        "address": definition.address,
+    }
+    if definition.reversed:
+        payload["reversed"] = True
+    return payload
 
 
 def _cover_to_dict(definition: CoverDefinition) -> dict[str, Any]:
-    return {"key": definition.key, "name": definition.name, "address": definition.address}
+    payload = {
+        "key": definition.key,
+        "name": definition.name,
+        "address": definition.address,
+    }
+    if definition.reversed:
+        payload["reversed"] = True
+    return payload
 
 
 def _unit_to_str(unit: str | None) -> str | None:

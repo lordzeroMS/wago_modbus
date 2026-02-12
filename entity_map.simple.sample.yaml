@@ -1,0 +1,20 @@
+entities:
+  - name: "Terrace Blind"
+    type: cover
+    modbus_address: 32027
+    reversed: false
+
+  - name: "Kitchen Blind"
+    type: cover
+    address: 32032
+    reversed: true
+
+  - name: "Garden Light"
+    type: switch
+    address: 33184
+    reversed: false
+
+  - name: "Hallway Light"
+    type: coil
+    address: 33185
+    reversed: true

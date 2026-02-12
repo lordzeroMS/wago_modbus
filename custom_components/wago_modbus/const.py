@@ -94,6 +94,7 @@ class CoilDefinition:
     key: str
     name: str
     address: int
+    reversed: bool = False
 
 
 @dataclass(frozen=True)
@@ -101,6 +102,7 @@ class CoverDefinition:
     key: str
     name: str
     address: int
+    reversed: bool = False
 
 
 SENSOR_DEFINITIONS: Final = (

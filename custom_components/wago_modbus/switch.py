@@ -48,12 +48,19 @@ class WagoModbusSwitch(CoordinatorEntity[WagoModbusCoordinator], SwitchEntity):
     def is_on(self) -> bool | None:
         if not self.coordinator.data:
             return None
-        return self.coordinator.data.get_coil(self._definition.address)
+        state = self.coordinator.data.get_coil(self._definition.address)
+        if state is None:
+            return None
+        if self._definition.reversed:
+            return not state
+        return state
 
     async def async_turn_on(self, **kwargs) -> None:
-        await self._hub.async_write_coil(self._definition.address, True)
+        target_state = not self._definition.reversed
+        await self._hub.async_write_coil(self._definition.address, target_state)
         await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs) -> None:
-        await self._hub.async_write_coil(self._definition.address, False)
+        target_state = self._definition.reversed
+        await self._hub.async_write_coil(self._definition.address, target_state)
         await self.coordinator.async_request_refresh()

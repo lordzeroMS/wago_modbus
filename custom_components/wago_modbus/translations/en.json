@@ -29,12 +29,12 @@
           "max_coils_per_request": "Max coils per request",
           "port": "Port",
           "unit_id": "Unit ID",
-          "entity_map_json": "Entity map (JSON)"
+          "entity_map_json": "Entity map (JSON or YAML)"
         }
       }
     },
     "error": {
-      "invalid_entity_map": "Invalid entity map JSON"
+      "invalid_entity_map": "Invalid entity map JSON or YAML"
     }
   }
 }

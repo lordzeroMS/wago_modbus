@@ -63,32 +63,34 @@ class WagoModbusCover(CoordinatorEntity[WagoModbusCoordinator], CoverEntity):
         status = self._read_status()
         if status is None:
             return None
-        return max(0, min(100, 100 - status))
+        return self._modbus_to_ha_position(status)
 
     @property
     def is_closed(self) -> bool | None:
-        status = self._read_status()
-        if status is None:
+        position = self.current_cover_position
+        if position is None:
             return None
-        if status <= 5:
-            return False
-        if status >= 95:
+        if position <= 5:
             return True
+        if position >= 95:
+            return False
         return None
 
     async def async_open_cover(self, **kwargs) -> None:
-        await self._hub.async_write_register(self._definition.address, 0)
+        target = self._ha_to_modbus_position(100)
+        await self._hub.async_write_register(self._definition.address, target)
         await self.coordinator.async_request_refresh()
 
     async def async_close_cover(self, **kwargs) -> None:
-        await self._hub.async_write_register(self._definition.address, 100)
+        target = self._ha_to_modbus_position(0)
+        await self._hub.async_write_register(self._definition.address, target)
         await self.coordinator.async_request_refresh()
 
     async def async_set_cover_position(self, **kwargs) -> None:
         position = kwargs.get("position")
         if position is None:
             return
-        target = max(0, min(100, 100 - int(position)))
+        target = self._ha_to_modbus_position(int(position))
         await self._hub.async_write_register(self._definition.address, target)
         await self.coordinator.async_request_refresh()
 
@@ -101,3 +103,15 @@ class WagoModbusCover(CoordinatorEntity[WagoModbusCoordinator], CoverEntity):
         if status is None:
             return None
         return int(status)
+
+    def _ha_to_modbus_position(self, ha_position: int) -> int:
+        normalized = max(0, min(100, int(ha_position)))
+        if self._definition.reversed:
+            return normalized
+        return 100 - normalized
+
+    def _modbus_to_ha_position(self, modbus_position: int) -> int:
+        normalized = max(0, min(100, int(modbus_position)))
+        if self._definition.reversed:
+            return normalized
+        return 100 - normalized
