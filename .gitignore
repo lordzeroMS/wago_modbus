@@ -11,3 +11,4 @@ __pycache__/
 configuration.yaml
 modbus.yaml
 cover.yaml
+.beads/
