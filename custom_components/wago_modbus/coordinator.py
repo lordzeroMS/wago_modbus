@@ -75,6 +75,9 @@ class WagoModbusHub:
                 self._client.write_register, address, value
             )
 
+    def request_counters(self) -> tuple[int, int]:
+        return self._client.request_count, self._client.request_error_count
+
 
 def build_input_addresses(entity_map: EntityMap) -> list[int]:
     return [
@@ -162,6 +165,16 @@ class WagoModbusCoordinator(DataUpdateCoordinator[ModbusData]):
         self._input_blocks = input_blocks
         self._holding_blocks = holding_blocks
         self._coil_blocks = coil_blocks
+
+    @property
+    def request_count(self) -> int:
+        count, _ = self._hub.request_counters()
+        return count
+
+    @property
+    def request_error_count(self) -> int:
+        _, error_count = self._hub.request_counters()
+        return error_count
 
 
 async def async_build_hub(hass: HomeAssistant, entry) -> WagoModbusHub:

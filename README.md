@@ -16,6 +16,9 @@ Custom Home Assistant integration for a WAGO Modbus TCP controller with a fixed 
 - With the sample map and default limits, this results in 2 read requests per scan cycle:
   - 1 register request
   - 1 coil request
+- Additional diagnostic sensors are exposed:
+  - `Modbus Requests Total` (count since integration start)
+  - `Modbus Requests Error` (failed request count since integration start)
 
 ## Installation
 1. Copy `custom_components/wago_modbus` into your Home Assistant `custom_components` directory.

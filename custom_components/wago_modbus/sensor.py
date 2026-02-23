@@ -1,10 +1,15 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Callable
 
-from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
+from homeassistant.components.sensor import (
+    SensorEntity,
+    SensorEntityDescription,
+    SensorStateClass,
+)
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -23,6 +28,31 @@ class WagoSensorDescription(SensorEntityDescription):
     scale: float
     offset: float
     precision: int | None
+
+
+@dataclass(frozen=True, kw_only=True)
+class WagoCounterSensorDescription(SensorEntityDescription):
+    value_fn: Callable[[WagoModbusCoordinator], int]
+
+
+COUNTER_SENSORS: tuple[WagoCounterSensorDescription, ...] = (
+    WagoCounterSensorDescription(
+        key="requests_total",
+        name="Modbus Requests Total",
+        icon="mdi:counter",
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda coordinator: coordinator.request_count,
+    ),
+    WagoCounterSensorDescription(
+        key="requests_error",
+        name="Modbus Requests Error",
+        icon="mdi:alert-circle-outline",
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda coordinator: coordinator.request_error_count,
+    ),
+)
 
 
 async def async_setup_entry(
@@ -51,8 +81,16 @@ async def async_setup_entry(
     )
 
     async_add_entities(
-        WagoModbusSensor(coordinator, entry.entry_id, device_info, description)
-        for description in sensor_types
+        [
+            WagoModbusSensor(coordinator, entry.entry_id, device_info, description)
+            for description in sensor_types
+        ]
+        + [
+            WagoModbusCounterSensor(
+                coordinator, entry.entry_id, device_info, description
+            )
+            for description in COUNTER_SENSORS
+        ]
     )
 
 
@@ -85,3 +123,23 @@ class WagoModbusSensor(CoordinatorEntity[WagoModbusCoordinator], SensorEntity):
         if self.entity_description.precision is not None:
             return round(value, self.entity_description.precision)
         return value
+
+
+class WagoModbusCounterSensor(CoordinatorEntity[WagoModbusCoordinator], SensorEntity):
+    _attr_has_entity_name = True
+
+    def __init__(
+        self,
+        coordinator: WagoModbusCoordinator,
+        entry_id: str,
+        device_info,
+        description: WagoCounterSensorDescription,
+    ) -> None:
+        super().__init__(coordinator)
+        self.entity_description = description
+        self._attr_unique_id = f"{entry_id}_{description.key}"
+        self._attr_device_info = device_info
+
+    @property
+    def native_value(self) -> Any:
+        return self.entity_description.value_fn(self.coordinator)

@@ -28,6 +28,22 @@ class WagoModbusClient:
         self._unit_id = unit_id
         self._timeout = timeout
         self._address_offset = address_offset
+        self._request_count = 0
+        self._request_error_count = 0
+
+    @property
+    def request_count(self) -> int:
+        return self._request_count
+
+    @property
+    def request_error_count(self) -> int:
+        return self._request_error_count
+
+    def _mark_request(self) -> None:
+        self._request_count += 1
+
+    def _mark_request_error(self) -> None:
+        self._request_error_count += 1
 
     def update_config(
         self, host: str, port: int, unit_id: int, timeout: int, address_offset: int
@@ -46,6 +62,8 @@ class WagoModbusClient:
     ) -> ModbusData:
         client = ModbusTcpClient(self._host, port=self._port, timeout=self._timeout)
         if not client.connect():
+            self._mark_request()
+            self._mark_request_error()
             raise ModbusClientError("Unable to connect to Modbus TCP host")
 
         input_registers: dict[int, int] = {}
@@ -83,12 +101,15 @@ class WagoModbusClient:
     def write_coil(self, address: int, value: bool) -> None:
         client = ModbusTcpClient(self._host, port=self._port, timeout=self._timeout)
         if not client.connect():
+            self._mark_request()
+            self._mark_request_error()
             raise ModbusClientError("Unable to connect to Modbus TCP host")
         try:
             result = self._call_with_unit(
                 client.write_coil, address + self._address_offset, value
             )
             if result.isError():
+                self._mark_request_error()
                 raise ModbusClientError("Modbus coil write failed")
         except ModbusException as err:
             LOGGER.debug("Modbus write_coil error: %s", err)
@@ -99,12 +120,15 @@ class WagoModbusClient:
     def write_register(self, address: int, value: int) -> None:
         client = ModbusTcpClient(self._host, port=self._port, timeout=self._timeout)
         if not client.connect():
+            self._mark_request()
+            self._mark_request_error()
             raise ModbusClientError("Unable to connect to Modbus TCP host")
         try:
             result = self._call_with_unit(
                 client.write_register, address + self._address_offset, value
             )
             if result.isError():
+                self._mark_request_error()
                 raise ModbusClientError("Modbus register write failed")
         except ModbusException as err:
             LOGGER.debug("Modbus write_register error: %s", err)
@@ -134,6 +158,7 @@ class WagoModbusClient:
             raise ModbusClientError("Modbus register read raised an exception") from err
 
         if result.isError() or not hasattr(result, "registers"):
+            self._mark_request_error()
             raise ModbusClientError("Modbus register read returned error")
 
         registers: dict[int, int] = {}
@@ -154,6 +179,7 @@ class WagoModbusClient:
             raise ModbusClientError("Modbus coil read raised an exception") from err
 
         if result.isError() or not hasattr(result, "bits"):
+            self._mark_request_error()
             raise ModbusClientError("Modbus coil read returned error")
 
         coils: dict[int, bool] = {}
@@ -162,13 +188,17 @@ class WagoModbusClient:
         return coils
 
     def _call_with_unit(self, func, *args, **kwargs):
+        self._mark_request()
         try:
             params = inspect.signature(func).parameters
         except (TypeError, ValueError):
             params = {}
-
-        if "slave" in params:
-            return func(*args, slave=self._unit_id, **kwargs)
-        if "unit" in params:
-            return func(*args, unit=self._unit_id, **kwargs)
-        return func(*args, **kwargs)
+        try:
+            if "slave" in params:
+                return func(*args, slave=self._unit_id, **kwargs)
+            if "unit" in params:
+                return func(*args, unit=self._unit_id, **kwargs)
+            return func(*args, **kwargs)
+        except Exception:
+            self._mark_request_error()
+            raise
