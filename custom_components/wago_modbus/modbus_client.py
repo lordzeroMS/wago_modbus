@@ -58,6 +58,9 @@ class WagoModbusClient:
                     client, block, register_type="input"
                 )
                 input_registers.update(registers)
+                # FC4 is used as the unified polling source. Mirror values so
+                # entities that look up holding registers still resolve.
+                holding_registers.update(registers)
 
             for block in holding_blocks:
                 registers = self._read_register_block(

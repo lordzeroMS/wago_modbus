@@ -98,6 +98,13 @@ def build_holding_addresses(entity_map: EntityMap) -> list[int]:
     return addresses
 
 
+def build_register_addresses(entity_map: EntityMap) -> list[int]:
+    """Build unified register address list for FC4 polling."""
+    return sorted(
+        set(build_input_addresses(entity_map) + build_holding_addresses(entity_map))
+    )
+
+
 def build_coil_addresses(entity_map: EntityMap) -> list[int]:
     return [definition.address for definition in entity_map.switches]
 
@@ -115,8 +122,9 @@ def build_entry_blocks(
     max_coils = entry_option(
         entry, CONF_MAX_COILS_PER_REQUEST, DEFAULT_MAX_COILS_PER_REQUEST
     )
-    input_blocks = build_blocks(build_input_addresses(entity_map), max_registers)
-    holding_blocks = build_blocks(build_holding_addresses(entity_map), max_registers)
+    # Read all register-backed entities via FC4 in one unified block set.
+    input_blocks = build_blocks(build_register_addresses(entity_map), max_registers)
+    holding_blocks: list[ModbusBlock] = []
     coil_blocks = build_blocks(build_coil_addresses(entity_map), max_coils)
     return input_blocks, holding_blocks, coil_blocks
 

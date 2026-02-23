@@ -64,7 +64,7 @@ OPTIONS_SCHEMA = vol.Schema(
         vol.Required(
             CONF_ENTITY_MAP, default=default_entity_map_json()
         ): selector.TextSelector(
-            selector.TextSelectorConfig(multiline=True, rows=20)
+            selector.TextSelectorConfig(multiline=True)
         ),
     }
 )

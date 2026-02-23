@@ -1,14 +1,21 @@
 # WAGO Modbus Home Assistant Integration
 
-Custom Home Assistant integration for a WAGO Modbus TCP controller with a fixed register map. The integration batches reads to avoid overwhelming the controller (one request per register type by default).
+Custom Home Assistant integration for a WAGO Modbus TCP controller with a fixed register map. The integration batches reads to avoid overwhelming the controller (one unified register read plus one coil read by default).
 
 ## Features
-- Batched Modbus reads for input registers, holding registers, and coils.
+- Batched Modbus reads with one FC4 register block set plus one coil block set.
 - Sensor entities for temperature, humidity, and shutter status.
 - Climate entities for heating setpoints.
 - Switch entities for lights.
 - Cover entities for roller shutters.
 - Config flow UI with options for scan interval, address offset, and request sizing.
+
+## Polling Behavior
+- Register-backed entities (sensors, climates, covers) are polled via `read_input_registers` (FC4) using merged address blocks.
+- Switch entities are polled via `read_coils` (FC1).
+- With the sample map and default limits, this results in 2 read requests per scan cycle:
+  - 1 register request
+  - 1 coil request
 
 ## Installation
 1. Copy `custom_components/wago_modbus` into your Home Assistant `custom_components` directory.
@@ -37,6 +44,8 @@ Options (via the integration options menu):
 - Full map format example: `entity_map.sample.json`
 - Minimal format example (covers/switches only): `entity_map.simple.sample.yaml`
 - Entity names are ASCII-only by default; you can rename entities in Home Assistant for localized names.
+- Ensure your controller exposes the configured register addresses through FC4 (`read_input_registers`).
+- Climate and cover writes still use `write_register` for target/control registers.
 
 ## Minimal Entity Map Format
 You can paste this directly in the UI options field to define only switches/covers:
